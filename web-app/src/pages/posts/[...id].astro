@@ -1,0 +1,200 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+import PdfEmbed from '../../components/PdfEmbed.astro';
+import {
+  getPosts,
+  prevNext,
+  categoryOf,
+  subtopicOf,
+  categoryLabel,
+  categoryTone,
+  assetUrlOf,
+  postUrl,
+} from '../../lib/posts';
+import { BASE } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post) => ({ params: { id: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const posts = await getPosts();
+const { prev, next } = prevNext(post, posts);
+const { Content, headings, remarkPluginFrontmatter } = await render(post);
+const category = categoryOf(post);
+const subtopic = subtopicOf(post);
+const minutes = remarkPluginFrontmatter.minutesRead;
+const pdfUrl = post.data.pdf ? assetUrlOf(post, post.data.pdf) : undefined;
+const hasBody = (post.body ?? '').trim().length > 0;
+---
+
+<Base title={post.data.title} description={post.data.description}>
+  <div class="post-grid wrap-wide">
+    <article>
+      <header class="paper-head">
+        <p class="label meta">
+          <a class={`tone-${categoryTone(category)}`} href={`${BASE}/${category}/`}>
+            {categoryLabel(category)}{subtopic && ` / ${subtopic}`}
+          </a>
+          <FormattedDate date={post.data.date} />
+          {minutes && <span>{minutes} min read</span>}
+        </p>
+        <h1>{post.data.title}</h1>
+        {post.data.description && <p class="abstract">{post.data.description}</p>}
+        {
+          post.data.tags.length > 0 && (
+            <p class="label tags">
+              {post.data.tags.map((tag) => (
+                <a href={`${BASE}/tags/${tag}/`}>#{tag}</a>
+              ))}
+            </p>
+          )
+        }
+      </header>
+
+      {pdfUrl && <PdfEmbed url={pdfUrl} title={post.data.title} />}
+
+      {
+        hasBody && (
+          <div class="prose">
+            <Content />
+          </div>
+        )
+      }
+
+      <nav class="pager" aria-label="Adjacent posts">
+        <div>
+          {
+            prev && (
+              <a href={postUrl(prev)}>
+                <span class="label">← older</span>
+                <span class="pager-title">{prev.data.title}</span>
+              </a>
+            )
+          }
+        </div>
+        <div class="pager-next">
+          {
+            next && (
+              <a href={postUrl(next)}>
+                <span class="label">newer →</span>
+                <span class="pager-title">{next.data.title}</span>
+              </a>
+            )
+          }
+        </div>
+      </nav>
+    </article>
+
+    <aside>
+      <div class="toc-sticky">
+        <TableOfContents headings={headings} />
+      </div>
+    </aside>
+  </div>
+</Base>
+
+<style>
+  .post-grid {
+    display: grid;
+    grid-template-columns: minmax(0, var(--w-content));
+    justify-content: center;
+    gap: 3rem;
+    padding-top: 2.8rem;
+  }
+
+  aside {
+    display: none;
+  }
+
+  @media (min-width: 72rem) {
+    .post-grid {
+      grid-template-columns: minmax(0, var(--w-content)) 13rem;
+    }
+
+    aside {
+      display: block;
+    }
+
+    .toc-sticky {
+      position: sticky;
+      top: 2.5rem;
+    }
+  }
+
+  .paper-head {
+    margin-bottom: 2.4rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  h1 {
+    font-size: clamp(1.85rem, 4.5vw, 2.45rem);
+    font-weight: 600;
+    line-height: 1.18;
+    letter-spacing: -0.018em;
+    margin-top: 0.9rem;
+  }
+
+  .abstract {
+    font-style: italic;
+    font-size: 1.04rem;
+    color: var(--ink-2);
+    margin-top: 1rem;
+    line-height: 1.6;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    margin-top: 1.2rem;
+  }
+
+  .tags a {
+    color: var(--ink-3);
+  }
+
+  .tags a:hover {
+    color: var(--accent);
+  }
+
+  .pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 4rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .pager a {
+    display: block;
+  }
+
+  .pager-next {
+    text-align: right;
+  }
+
+  .pager-title {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-top: 0.35rem;
+    transition: color 120ms ease;
+  }
+
+  .pager a:hover .pager-title {
+    color: var(--accent);
+  }
+</style>

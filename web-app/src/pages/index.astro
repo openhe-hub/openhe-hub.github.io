@@ -1,0 +1,126 @@
+---
+import Base from '../layouts/Base.astro';
+import PostRow from '../components/PostRow.astro';
+import { getPosts } from '../lib/posts';
+import { SITE } from '../lib/site';
+
+const posts = await getPosts();
+const byYear = new Map<number, typeof posts>();
+for (const post of posts) {
+  const year = post.data.date.getFullYear();
+  if (!byYear.has(year)) byYear.set(year, []);
+  byYear.get(year)!.push(post);
+}
+---
+
+<Base>
+  <div class="wrap">
+    <section class="masthead">
+      <div>
+        <h1>{SITE.title}</h1>
+        <p class="tagline">{SITE.description}</p>
+      </div>
+      <!-- Epipolar geometry, drawn in hairlines: two cameras, one point. -->
+      <svg class="figure" viewBox="0 0 220 130" fill="none" aria-hidden="true">
+        <g stroke="currentColor" stroke-width="0.8">
+          <circle cx="30" cy="110" r="2" fill="currentColor" stroke="none"></circle>
+          <circle cx="190" cy="110" r="2" fill="currentColor" stroke="none"></circle>
+          <circle cx="112" cy="18" r="2.4" fill="currentColor" stroke="none"></circle>
+          <path d="M30 110 L190 110" stroke-dasharray="3 3"></path>
+          <path d="M30 110 L112 18 M190 110 L112 18"></path>
+          <path d="M52 74 L92 62 L96 88 L56 100 Z"></path>
+          <path d="M128 62 L168 74 L164 100 L124 88 Z"></path>
+          <circle cx="76" cy="80" r="1.6" fill="currentColor" stroke="none"></circle>
+          <circle cx="146" cy="80" r="1.6" fill="currentColor" stroke="none"></circle>
+        </g>
+        <g class="labels" fill="currentColor">
+          <text x="20" y="124">C</text>
+          <text x="186" y="124">C′</text>
+          <text x="118" y="14">X</text>
+        </g>
+      </svg>
+    </section>
+
+    <section>
+      {
+        [...byYear.entries()].map(([year, yearPosts]) => (
+          <div class="year-group">
+            <p class="label year">{year}</p>
+            <div class="rows">
+              {yearPosts.map((post) => (
+                <PostRow post={post} />
+              ))}
+            </div>
+          </div>
+        ))
+      }
+      {
+        posts.length === 0 && (
+          <p class="empty">
+            No posts yet — drop a markdown file into <code>assets/</code> to publish the first one.
+          </p>
+        )
+      }
+    </section>
+  </div>
+</Base>
+
+<style>
+  .masthead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    padding-block: 3.2rem 2.6rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  h1 {
+    font-size: 2.1rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  .tagline {
+    font-style: italic;
+    color: var(--ink-2);
+    margin-top: 0.4rem;
+  }
+
+  .figure {
+    width: 12.5rem;
+    flex-shrink: 0;
+    color: var(--ink-3);
+  }
+
+  .figure .labels text {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 9px;
+  }
+
+  @media (max-width: 40rem) {
+    .figure {
+      display: none;
+    }
+  }
+
+  .year-group {
+    padding-top: 1.6rem;
+  }
+
+  .year {
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.5rem;
+  }
+
+  .rows > :global(.post-row + .post-row) {
+    border-top: 1px solid var(--line);
+  }
+
+  .empty {
+    padding-block: 3rem;
+    color: var(--ink-2);
+    font-style: italic;
+  }
+</style>

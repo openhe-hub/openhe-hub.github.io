@@ -1,0 +1,40 @@
+---
+import Base from '../layouts/Base.astro';
+import { BASE } from '../lib/site';
+---
+
+<Base title="404">
+  <div class="wrap">
+    <p class="label">error</p>
+    <h1>404 — feature not detected.</h1>
+    <p class="hint">The page you’re looking for doesn’t match anything here.</p>
+    <p class="back"><a href={`${BASE}/`}>← Back to the index</a></p>
+  </div>
+</Base>
+
+<style>
+  .wrap {
+    padding-top: 5rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    margin-top: 0.5rem;
+  }
+
+  .hint {
+    color: var(--ink-2);
+    font-style: italic;
+    margin-top: 0.8rem;
+  }
+
+  .back {
+    margin-top: 2rem;
+  }
+
+  .back a {
+    color: var(--accent);
+  }
+</style>

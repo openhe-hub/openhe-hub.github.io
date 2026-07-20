@@ -1,0 +1,76 @@
+---
+import Base from '../../layouts/Base.astro';
+import { allTags } from '../../lib/posts';
+import { BASE } from '../../lib/site';
+
+const tags = await allTags();
+---
+
+<Base title="Tags" description="Browse posts by tag">
+  <div class="wrap">
+    <header class="page-head">
+      <p class="label">index</p>
+      <h1>Tags</h1>
+    </header>
+
+    <ul class="tag-list">
+      {
+        [...tags.entries()].map(([tag, posts]) => (
+          <li>
+            <a href={`${BASE}/tags/${tag}/`}>
+              <span class="tag-name">#{tag}</span>
+              <span class="label">{posts.length}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    {tags.size === 0 && <p class="empty">No tags yet.</p>}
+  </div>
+</Base>
+
+<style>
+  .page-head {
+    padding-block: 3rem 1.4rem;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 1.8rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    margin-top: 0.4rem;
+  }
+
+  .tag-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+  }
+
+  .tag-list a {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.95rem;
+    transition:
+      border-color 120ms ease,
+      color 120ms ease;
+  }
+
+  .tag-list a:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .empty {
+    padding-block: 3rem;
+    color: var(--ink-2);
+    font-style: italic;
+  }
+</style>

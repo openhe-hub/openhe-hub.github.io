@@ -1,0 +1,79 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+import { SITE, BASE } from '../lib/site';
+
+const nav = [
+  { href: `${BASE}/cv/`, label: 'cv' },
+  { href: `${BASE}/robotics/`, label: 'robotics' },
+  { href: `${BASE}/blogs/`, label: 'blog' },
+  { href: `${BASE}/tags/`, label: 'tags' },
+];
+const path = Astro.url.pathname;
+---
+
+<header class="site-header">
+  <div class="wrap-wide bar">
+    <a class="site-name" href={`${BASE}/`}>{SITE.title}</a>
+    <nav aria-label="Site">
+      <ul class="label">
+        {
+          nav.map((item) => (
+            <li>
+              <a href={item.href} aria-current={path.startsWith(item.href) ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+        <li><ThemeToggle /></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 0.9rem;
+  }
+
+  .site-name {
+    font-weight: 600;
+    font-size: 1.02rem;
+    letter-spacing: -0.01em;
+  }
+
+  .site-name:hover {
+    color: var(--accent);
+  }
+
+  ul {
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+    list-style: none;
+  }
+
+  nav a {
+    color: var(--ink-2);
+    transition: color 120ms ease;
+  }
+
+  nav a:hover,
+  nav a[aria-current='page'] {
+    color: var(--accent);
+  }
+
+  @media (max-width: 40rem) {
+    ul {
+      gap: 0.9rem;
+    }
+  }
+</style>

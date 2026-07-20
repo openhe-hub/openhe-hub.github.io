@@ -1,0 +1,75 @@
+---
+import FormattedDate from './FormattedDate.astro';
+import { categoryOf, subtopicOf, categoryLabel, categoryTone, postUrl, type Post } from '../lib/posts';
+
+interface Props {
+  post: Post;
+  // Hide the category in the meta line (e.g. on category pages).
+  showCategory?: boolean;
+}
+
+const { post, showCategory = true } = Astro.props;
+const category = categoryOf(post);
+const subtopic = subtopicOf(post);
+const minutes = (post.rendered?.metadata?.frontmatter as { minutesRead?: number } | undefined)
+  ?.minutesRead;
+---
+
+<article class="post-row">
+  <a href={postUrl(post)}>
+    <p class="label meta">
+      <FormattedDate date={post.data.date} />
+      {
+        showCategory && (
+          <span class={`tone-${categoryTone(category)}`}>
+            {categoryLabel(category)}
+            {subtopic && ` / ${subtopic}`}
+          </span>
+        )
+      }
+      {minutes && <span>{minutes} min</span>}
+      {post.data.pdf && <span class="pdf-badge">pdf</span>}
+    </p>
+    <h3 class="title">{post.data.title}</h3>
+    {post.data.description && <p class="desc">{post.data.description}</p>}
+  </a>
+</article>
+
+<style>
+  .post-row a {
+    display: block;
+    padding-block: 1.15rem;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+  }
+
+  .title {
+    font-size: 1.22rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+    margin-top: 0.3rem;
+    transition: color 120ms ease;
+  }
+
+  .post-row a:hover .title {
+    color: var(--accent);
+  }
+
+  .desc {
+    font-size: 0.93rem;
+    color: var(--ink-2);
+    margin-top: 0.25rem;
+    line-height: 1.6;
+  }
+
+  .pdf-badge {
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 0.05em 0.4em;
+  }
+</style>

@@ -1,0 +1,97 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostRow from '../../components/PostRow.astro';
+import { getPosts, subtopicOf, CATEGORIES, categoryLabel, categoryTone, type Post } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  return Object.keys(CATEGORIES).map((category) => ({ params: { category } }));
+}
+
+const { category } = Astro.params;
+const posts = await getPosts(category);
+
+// Group by subtopic; posts directly under the category (or in common/)
+// go into a general bucket shown last.
+const groups = new Map<string, Post[]>();
+const general: Post[] = [];
+for (const post of posts) {
+  const subtopic = subtopicOf(post);
+  if (!subtopic || subtopic === 'common') {
+    general.push(post);
+  } else {
+    if (!groups.has(subtopic)) groups.set(subtopic, []);
+    groups.get(subtopic)!.push(post);
+  }
+}
+const sections: Array<[string | null, Post[]]> = [...groups.entries()].sort((a, b) =>
+  a[0].localeCompare(b[0])
+);
+if (general.length) sections.push([null, general]);
+---
+
+<Base title={categoryLabel(category)} description={`Posts on ${categoryLabel(category).toLowerCase()}`}>
+  <div class="wrap">
+    <header class="page-head">
+      <p class="label">section</p>
+      <h1 class={`tone-${categoryTone(category)}`}>{categoryLabel(category)}</h1>
+      <p class="label count">{posts.length} {posts.length === 1 ? 'post' : 'posts'}</p>
+    </header>
+
+    {
+      sections.map(([subtopic, sectionPosts]) => (
+        <section class="group">
+          <p class="label group-name">{subtopic ?? 'general'}</p>
+          <div class="rows">
+            {sectionPosts.map((post) => (
+              <PostRow post={post} showCategory={false} />
+            ))}
+          </div>
+        </section>
+      ))
+    }
+    {
+      posts.length === 0 && (
+        <p class="empty">
+          Nothing here yet — add a markdown file under <code>assets/{category}/</code>.
+        </p>
+      )
+    }
+  </div>
+</Base>
+
+<style>
+  .page-head {
+    padding-block: 3rem 1.4rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    margin-top: 0.4rem;
+  }
+
+  .count {
+    margin-top: 0.6rem;
+  }
+
+  .group {
+    padding-top: 1.8rem;
+  }
+
+  .group-name {
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.5rem;
+  }
+
+  .rows > :global(.post-row + .post-row) {
+    border-top: 1px solid var(--line);
+  }
+
+  .empty {
+    padding-block: 3rem;
+    color: var(--ink-2);
+    font-style: italic;
+  }
+</style>

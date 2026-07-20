@@ -1,0 +1,90 @@
+---
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+
+const headings = Astro.props.headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{
+  headings.length > 1 && (
+    <nav class="toc" aria-label="Table of contents">
+      <p class="label">Contents</p>
+      <ul>
+        {headings.map((h) => (
+          <li class={`depth-${h.depth}`}>
+            <a href={`#${h.slug}`}>{h.text}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<style>
+  .toc {
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    border-left: 1px solid var(--line);
+    padding-left: 1.1rem;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 0.8rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .depth-3 {
+    padding-left: 0.9rem;
+  }
+
+  a {
+    color: var(--ink-3);
+    transition: color 120ms ease;
+  }
+
+  a:hover {
+    color: var(--ink);
+  }
+
+  a[aria-current='true'] {
+    color: var(--accent);
+  }
+</style>
+
+<script>
+  const toc = document.querySelector('.toc');
+  if (toc) {
+    const links = [...toc.querySelectorAll('a')];
+    const bySlug = new Map(links.map((a) => [decodeURIComponent(a.hash.slice(1)), a]));
+    let active: HTMLAnchorElement | undefined;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const link = bySlug.get(entry.target.id);
+            if (link) {
+              active?.removeAttribute('aria-current');
+              link.setAttribute('aria-current', 'true');
+              active = link;
+            }
+          }
+        }
+      },
+      { rootMargin: '-10% 0% -75% 0%' }
+    );
+
+    for (const slug of bySlug.keys()) {
+      const el = document.getElementById(slug);
+      if (el) observer.observe(el);
+    }
+  }
+</script>

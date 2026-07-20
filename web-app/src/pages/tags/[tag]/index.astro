@@ -1,0 +1,49 @@
+---
+import Base from '../../../layouts/Base.astro';
+import PostRow from '../../../components/PostRow.astro';
+import { allTags } from '../../../lib/posts';
+
+export async function getStaticPaths() {
+  const tags = await allTags();
+  return [...tags.entries()].map(([tag, posts]) => ({ params: { tag }, props: { posts } }));
+}
+
+const { tag } = Astro.params;
+const { posts } = Astro.props;
+---
+
+<Base title={`#${tag}`} description={`Posts tagged #${tag}`}>
+  <div class="wrap">
+    <header class="page-head">
+      <p class="label">tag</p>
+      <h1>#{tag}</h1>
+      <p class="label count">{posts.length} {posts.length === 1 ? 'post' : 'posts'}</p>
+    </header>
+
+    <div class="rows">
+      {posts.map((post) => <PostRow post={post} />)}
+    </div>
+  </div>
+</Base>
+
+<style>
+  .page-head {
+    padding-block: 3rem 1.4rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    margin-top: 0.4rem;
+  }
+
+  .count {
+    margin-top: 0.6rem;
+  }
+
+  .rows > :global(.post-row + .post-row) {
+    border-top: 1px solid var(--line);
+  }
+</style>

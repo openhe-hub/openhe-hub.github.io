@@ -1,0 +1,42 @@
+<button id="theme-toggle" type="button" aria-label="Toggle color theme">
+  <svg class="sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+    <circle cx="12" cy="12" r="4.6"></circle>
+    <path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M4.9 19.1l1.7-1.7M17.4 6.6l1.7-1.7"></path>
+  </svg>
+  <svg class="moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+    <path d="M20.4 14.2A8.6 8.6 0 0 1 9.8 3.6a8.6 8.6 0 1 0 10.6 10.6Z"></path>
+  </svg>
+</button>
+
+<style>
+  button {
+    display: inline-flex;
+    align-items: center;
+    background: none;
+    border: none;
+    padding: 0.2rem;
+    cursor: pointer;
+    color: var(--ink-2);
+    transition: color 120ms ease;
+  }
+
+  button:hover {
+    color: var(--accent);
+  }
+
+  :global(:root[data-theme='dark']) .sun {
+    display: none;
+  }
+
+  :global(:root:not([data-theme='dark'])) .moon {
+    display: none;
+  }
+</style>
+
+<script>
+  document.getElementById('theme-toggle')?.addEventListener('click', () => {
+    const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem('theme', next);
+  });
+</script>
