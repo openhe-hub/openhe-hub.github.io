@@ -18,7 +18,7 @@ export default defineConfig({
     remarkPlugins: [remarkMath, remarkReadingTime],
     rehypePlugins: [rehypeKatex],
     shikiConfig: {
-      themes: { light: 'min-light', dark: 'min-dark' },
+      themes: { light: 'github-light', dark: 'github-dark-dimmed' },
       defaultColor: false,
     },
   },

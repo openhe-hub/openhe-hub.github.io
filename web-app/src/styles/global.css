@@ -222,7 +222,8 @@ a {
   height: auto;
 }
 
-.prose p:has(> img:only-child) + p:has(> em:only-child) {
+.prose p:has(> img:only-child) + p:has(> em:only-child),
+.prose video + p:has(> em:only-child) {
   text-align: center;
   font-size: 0.875rem;
   color: var(--ink-2);
