@@ -3,7 +3,7 @@ export const SITE = {
   description: 'Research notes on computer vision and robotics.',
   author: 'Zhewen He',
   // Shown in the footer; leave empty to hide.
-  github: 'https://github.com/hezhewen2004',
+  github: 'https://github.com/openhe-hub',
   email: 'hezhewen2004@gmail.com',
 };
 

@@ -10,7 +10,7 @@ import { remarkReadingTime } from './src/plugins/remark-reading-time.mjs';
 // - For a project repo (e.g. "blog"): set site to
 //   'https://<username>.github.io' and base to '/blog'.
 export default defineConfig({
-  site: 'https://hezhewen2004.github.io',
+  site: 'https://openhe-hub.github.io',
   base: '/',
   trailingSlash: 'ignore',
   integrations: [sitemap()],
