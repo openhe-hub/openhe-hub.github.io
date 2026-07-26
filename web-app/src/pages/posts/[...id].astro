@@ -123,6 +123,9 @@ const hasBody = (post.body ?? '').trim().length > 0;
     .toc-sticky {
       position: sticky;
       top: 2.5rem;
+      max-height: calc(100vh - 5rem);
+      overflow-y: auto;
+      scrollbar-width: thin;
     }
   }
 
