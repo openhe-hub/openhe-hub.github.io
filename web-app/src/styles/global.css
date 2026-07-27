@@ -263,6 +263,17 @@ a {
   border-top: 1px solid var(--line);
 }
 
+/* Narrow screens: wide tables scroll inside their own box rather than pushing
+   the page body sideways. Scoped to a media query so desktop layout is
+   unchanged. */
+@media (max-width: 40rem) {
+  .prose table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+}
+
 /* Code */
 .prose code {
   font-family: var(--font-mono);

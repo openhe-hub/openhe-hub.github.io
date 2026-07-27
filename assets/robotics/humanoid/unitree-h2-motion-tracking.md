@@ -27,35 +27,32 @@ tags: [humanoid, mjlab, mujoco, retargeting, beyondmimic, rl, sim2real]
 ## 2. 全景流水线
 
 ```
-                     ┌─────────────── 一次性接线 ────────────────┐
-                     │  setup_gmr_h2.sh                          │
-                     │   ├─ h2.xml + h2_mocap.xml → GMR/assets/  │
-                     │   ├─ bvh_lafan1_to_h2.json → ik_configs/  │
-                     │   └─ patch params.py（4 处字典注册）      │
-                     └───────────────────┬───────────────────────┘
-                                         │
-  LAFAN1 .bvh                            ▼
-  (30 fps 人体 mocap)  ──►  GMR 两阶段加权 IK  ──►  .pkl
-                            [CPU · ~2 min/段]        │
-                                                     │ batch_gmr_pkl_to_csv
-                                                     ▼
-                                                   .csv   ← 入 git，可人工 QC
-                                                     │
-                            csv_to_npz.py --robot h2 │  [GPU]
-                            30 → 50 fps 插值          │  lerp / slerp
-                            有限差分补速度            ▼
-                                                   .npz   参考轨迹
-                                                     │    (pos/quat/lin_vel/ang_vel)
-                                                     ▼
-                          ┌──────────────────────────────────────┐
-   H2-Flat velocity ─────►│  PPO (rsl_rl) · 4096 envs · mjlab    │
-   策略（地基/自检）      │  Unitree-H2-Tracking-*               │
-                          └──────────────────┬───────────────────┘
-                                             │
-                                    model_*.pt + policy.onnx
-                                             │
-                                             ▼
-                                   play.py（渲染验证） / 实机部署
+  LAFAN1 .bvh    30 fps 人体 mocap
+       │
+       │   ┌─ 一次性接线   setup_gmr_h2.sh ─────────────────────
+       │   │    h2.xml + h2_mocap.xml  ──►  GMR/assets/unitree_h2/
+       │   │    bvh_lafan1_to_h2.json  ──►  GMR/.../ik_configs/
+       │   │    patch params.py        ──►  4 处字典注册 + 断言校验
+       │   └──────────────────────────────────────────────────────
+       ▼
+  GMR 两阶段加权 IK                       CPU · 约 2 min/段
+       │
+       ▼
+  motion.pkl  ──►  batch_gmr_pkl_to_csv  ──►  motion.csv
+                                                   │
+                                                   │  入 git，可回放人工 QC
+                                                   ▼
+  csv_to_npz.py --robot h2                30 → 50 fps  lerp / slerp
+       │                                  有限差分补速度         [GPU]
+       ▼
+  motion.npz   参考轨迹  pos / quat / lin_vel / ang_vel
+       │
+       ▼
+  PPO (rsl_rl) · mjlab · 4096 envs
+       │      Unitree-H2-Flat         速度跟踪（地基 / 自检）
+       │      Unitree-H2-Tracking-*   动作追踪
+       ▼
+  model_*.pt + policy.onnx  ──►  play.py 渲染验证  /  实机部署
 ```
 
 *Figure 1. 从人体动捕到可部署策略的完整链路。虚框内是接 GMR 的一次性改动，其余每一步都有对应的 sbatch 包装。*
