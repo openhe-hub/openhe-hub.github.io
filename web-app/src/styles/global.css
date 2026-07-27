@@ -296,6 +296,36 @@ a {
   color: var(--shiki-dark);
 }
 
+/* Mermaid diagrams: build-time SVGs, one per theme */
+.mermaid-figure {
+  margin-block: 1.8em;
+  text-align: center;
+  overflow-x: auto;
+}
+
+.mermaid-figure svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Mermaid uses .label internally — undo the site's label styling there */
+.mermaid-figure .label {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  color: inherit;
+}
+
+:root:not([data-theme='dark']) .mermaid-dark {
+  display: none;
+}
+
+:root[data-theme='dark'] .mermaid-light {
+  display: none;
+}
+
 /* Math */
 .prose .katex-display {
   overflow-x: auto;

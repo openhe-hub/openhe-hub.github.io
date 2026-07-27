@@ -44,7 +44,18 @@ Keep media next to the markdown file.
   <video src="/assets/robotics/vla/demo.mp4" controls muted playsinline></video>
   ```
 
-- **Math**: `$...$` inline, `$$...$$` display (KaTeX).
+- **Math**: `$...$` inline, `$$...$$` display (KaTeX). Display math needs `$$`
+  on its own lines — single-line `$$x$$` renders as inline math.
+
+- **Diagrams**: ` ```mermaid ` code blocks render to static SVGs at build time
+  (light + dark variants, auto-switched with the theme):
+
+  ````markdown
+  ```mermaid
+  graph LR
+      A[Input] --> B{Tracked?}
+  ```
+  ````
 
 ## Local preview
 

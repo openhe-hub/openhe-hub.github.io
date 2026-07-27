@@ -19,7 +19,7 @@ description: 给定一个代码项目路径和主题，阅读项目内容并为�
 
 | 元素 | 实现方式 |
 |---|---|
-| 流程图/架构图 | 首选站点风格的 ASCII 图（放代码块里，参考已发布文章的画法：box-drawing 字符 + 箭头）；复杂的用 graphviz/matplotlib 生成 SVG/PNG |
+| 流程图/架构图 | 首选 ` ```mermaid ` 代码块（构建时渲染成双主题内联 SVG，支持 flowchart/sequence/state 等）；简单框图也可用站点风格的 ASCII 图（box-drawing 字符 + 箭头） |
 | 算法 | 伪代码放代码块，或真实核心代码节选（删减到 <30 行，保留灵魂）+ KaTeX 公式 |
 | 图片 | 项目自带图 > 运行截图 > matplotlib 生成的示意图/曲线图；生成图前先加载 dataviz skill |
 | 视频 demo | 项目自带 demo 视频；或用 ffmpeg 从运行输出的帧序列合成 mp4；屏幕录制需要用户配合时直接开口要 |

@@ -4,6 +4,7 @@ import sitemap from '@astrojs/sitemap';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { remarkReadingTime } from './src/plugins/remark-reading-time.mjs';
+import { rehypeMermaidDual } from './src/plugins/rehype-mermaid-dual.mjs';
 
 // Deployed to GitHub Pages.
 // - For a user site repo (<username>.github.io): keep base '/'.
@@ -15,8 +16,9 @@ export default defineConfig({
   trailingSlash: 'ignore',
   integrations: [sitemap()],
   markdown: {
+    syntaxHighlight: { type: 'shiki', excludeLangs: ['mermaid'] },
     remarkPlugins: [remarkMath, remarkReadingTime],
-    rehypePlugins: [rehypeKatex],
+    rehypePlugins: [rehypeKatex, rehypeMermaidDual],
     shikiConfig: {
       themes: { light: 'github-light', dark: 'github-dark-dimmed' },
       defaultColor: false,
